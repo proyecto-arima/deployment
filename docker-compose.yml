@@ -52,10 +52,10 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - CORS_ORIGIN=https://proyectoarima.tech
-      - HOST=be.proyectoarima.tech
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - HOST=${HOSTNAME}
       - PORT=8080
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
       - COMMON_RATE_LIMIT_WINDOW_MS=60000
       - COMMON_RATE_LIMIT_MAX_REQUESTS=1000
 
