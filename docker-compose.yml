@@ -57,7 +57,7 @@ services:
       - PORT=8080
       - NODE_ENV=production
       - COMMON_RATE_LIMIT_WINDOW_MS=60000
-      - COMMON_RATE_LIMIT_MAX_REQUESTS=100
+      - COMMON_RATE_LIMIT_MAX_REQUESTS=1000
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health-check"]
