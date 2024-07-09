@@ -40,13 +40,13 @@ services:
       - ./data/db:/data/db
 
   webapp:
-    image: ghcr.io/proyecto-arima/webapp:latest
+    image: ghcr.io/proyecto-arima/webapp:${LATEST_TAG}
     container_name: webapp
     restart: always
 
 
   backend:
-    image: ghcr.io/proyecto-arima/backend:latest
+    image: ghcr.io/proyecto-arima/backend:${LATEST_TAG}
     container_name: backend
     restart: always
     environment:
