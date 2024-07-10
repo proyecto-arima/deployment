@@ -54,7 +54,7 @@ services:
     container_name: backend
     restart: always
     environment:
-      - MONGODB_URI=${MONGO_URI}
+      - MONGODB_URI=${MONGODB_URI}
       - CORS_ORIGIN=${CORS_ORIGIN}
       - HOST=${HOSTNAME}
       - PORT=8080
