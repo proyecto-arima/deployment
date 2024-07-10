@@ -2,6 +2,7 @@ services:
   nginx:
     image: 'jc21/nginx-proxy-manager:latest'
     restart: unless-stopped
+    profiles: ["deploy"]
     ports:
       # These ports are in format <host-port>:<container-port>
       - '80:80' # Public HTTP Port
@@ -24,7 +25,8 @@ services:
 
   mongo:
     image: mongo
-    restart: always
+    restart: unless-stopped
+    profiles: ["mongo"]
     healthcheck:
       test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 5s
@@ -43,6 +45,8 @@ services:
     image: ghcr.io/proyecto-arima/webapp:${LATEST_TAG}
     container_name: webapp
     restart: always
+    environment:
+      - REACT_APP_API_URL=${API_URL}
 
 
   backend:
@@ -50,8 +54,7 @@ services:
     container_name: backend
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_URI=${MONGO_URI}
       - CORS_ORIGIN=${CORS_ORIGIN}
       - HOST=${HOSTNAME}
       - PORT=8080
@@ -69,6 +72,7 @@ services:
     image: portainer/portainer-ce:latest
     container_name: portainer
     restart: unless-stopped
+    profiles: ["deploy"]
     security_opt:
       - no-new-privileges:true
     volumes:
