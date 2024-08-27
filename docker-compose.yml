@@ -1,27 +1,28 @@
 services:
+
   nginx:
     image: 'jc21/nginx-proxy-manager:latest'
     restart: unless-stopped
     profiles: ["deploy"]
     ports:
-      # These ports are in format <host-port>:<container-port>
-      - '80:80' # Public HTTP Port
-      - '443:443' # Public HTTPS Port
-      - '81:81' # Admin Web Port
-      # Add any other Stream port you want to expose
-      # - '21:21' # FTP
-
-    # Uncomment the next line if you uncomment anything in the section
-    # environment:
-      # Uncomment this if you want to change the location of
-      # the SQLite DB file within the container
-      # DB_SQLITE_FILE: "/data/database.sqlite"
-
-      # Uncomment this if IPv6 is not enabled on your host
-      # DISABLE_IPV6: 'true'
+      - '80:80'
+      - '81:81'
+      - '443:443'
     volumes:
       - ./data/nginx-proxy-manager:/data
       - ./letsencrypt:/etc/letsencrypt
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    profiles: ["monitoring"]
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
 
   mongo:
     image: mongo
@@ -41,26 +42,56 @@ services:
     volumes:
       - ./data/db:/data/db
 
-  webapp:
-    image: ghcr.io/proyecto-arima/webapp:${LATEST_TAG}
-    container_name: webapp
-    restart: always
+  # TODO: WIP smtp
+  fake-smtp-server:
+    image: gessnerfl/fake-smtp-server:2.2.1
+    container_name: fake-smtp-server
+    profiles: ["smtp"]
+    restart: unless-stopped
     environment:
-      - REACT_APP_API_URL=${API_URL}
+      - FAKESMTP_AUTHENTICATION_USERNAME=${SMTP_USER}
+      - FAKESMTP_AUTHENTICATION_PASSWORD=${SMTP_PASS}
+    ports:
+        # smtp port
+      - ${SMTP_PORT}:${SMTP_PORT}
 
+        # management api
+      - 8082:8082
+
+        # web ui
+      - 8083:8083
 
   backend:
     image: ghcr.io/proyecto-arima/backend:${LATEST_TAG}
     container_name: backend
+    profiles: ["server"]
     restart: always
     environment:
+      - NODE_ENV=${NODE_ENV}
       - MONGODB_URI=${MONGODB_URI}
       - CORS_ORIGIN=${CORS_ORIGIN}
+ 
       - HOST=${HOSTNAME}
-      - PORT=8080
-      - NODE_ENV=${NODE_ENV}
-      - COMMON_RATE_LIMIT_WINDOW_MS=60000
-      - COMMON_RATE_LIMIT_MAX_REQUESTS=1000
+      - PORT=${PORT}
+      - FRONTEND_URL=${FRONTEND_URL}
+
+      - JWT_SECRET=${JWT_SECRET}
+      - COMMON_RATE_LIMIT_WINDOW_MS=${COMMON_RATE_LIMIT_WINDOW_MS}
+      - COMMON_RATE_LIMIT_MAX_REQUESTS=${COMMON_RATE_LIMIT_MAX_REQUESTS}
+
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SENDER=${SMTP_SENDER}
+      - SMTP_TLS=${SMTP_TLS}
+      - SMTP_AUTH_TYPE=${SMTP_AUTH_TYPE}
+
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - BUCKET=${BUCKET}
+      - PREFIX=${PREFIX}
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health-check"]
@@ -68,17 +99,14 @@ services:
       timeout: 10s
       retries: 5
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    restart: unless-stopped
-    profiles: ["deploy"]
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - portainer_data:/data
+  webapp:
+    image: ghcr.io/proyecto-arima/webapp:${LATEST_TAG}
+    container_name: webapp
+    profiles: ["webapp"]
+    restart: always
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - REACT_APP_ENV=${REACT_APP_ENV}
 
 volumes:
   portainer_data:
