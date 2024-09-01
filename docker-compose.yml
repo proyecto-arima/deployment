@@ -42,25 +42,6 @@ services:
     volumes:
       - ./data/db:/data/db
 
-  # TODO: WIP smtp
-  fake-smtp-server:
-    image: gessnerfl/fake-smtp-server:2.2.1
-    container_name: fake-smtp-server
-    profiles: ["smtp"]
-    restart: unless-stopped
-    environment:
-      - FAKESMTP_AUTHENTICATION_USERNAME=${SMTP_USER}
-      - FAKESMTP_AUTHENTICATION_PASSWORD=${SMTP_PASS}
-    ports:
-        # smtp port
-      - ${SMTP_PORT}:${SMTP_PORT}
-
-        # management api
-      - 8082:8082
-
-        # web ui
-      - 8083:8083
-
   backend:
     image: ghcr.io/proyecto-arima/backend:${LATEST_TAG}
     container_name: backend
@@ -84,8 +65,6 @@ services:
       - SMTP_PASS=${SMTP_PASS}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_SENDER=${SMTP_SENDER}
-      - SMTP_TLS=${SMTP_TLS}
-      - SMTP_AUTH_TYPE=${SMTP_AUTH_TYPE}
 
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
