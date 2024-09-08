@@ -28,15 +28,15 @@ services:
     image: mongo
     restart: unless-stopped
     profiles: ["mongo"]
-    healthcheck:
-      test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
+    # healthcheck:
+    #   test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 3
+    #   start_period: 5s
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD} 
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - 27017:27017
     volumes:
@@ -47,6 +47,8 @@ services:
     container_name: backend
     profiles: ["backend"]
     restart: always
+    ports:
+      - 8080:8080
     environment:
       - NODE_ENV=${NODE_ENV}
       - MONGODB_URI=${MONGODB_URI}
@@ -73,11 +75,11 @@ services:
       - BUCKET=${BUCKET}
       - PREFIX=${PREFIX}
 
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health-check"]
-      interval: 60s
-      timeout: 10s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health-check"]
+    #   interval: 60s
+    #   timeout: 10s
+    #   retries: 5
 
   webapp:
     image: ghcr.io/proyecto-arima/webapp:${LATEST_TAG}
@@ -88,7 +90,6 @@ services:
       - 3000:3000
     environment:
       - REACT_APP_API_URL=${REACT_APP_API_URL}
-      - REACT_APP_ENV=${REACT_APP_ENV}
 
 volumes:
   portainer_data:

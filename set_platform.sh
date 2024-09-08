@@ -1,23 +1,51 @@
-## project setup
+#/bin/bash
 
-## TODO: WIP
+############ NOTAS ############
 
-## git clone and download images
-# TODO: cd to deployment folder
+## SOLO HACE EL SETUP HASTA NGNIX
+
+## LAS IMAGENES DE LOS CONTAINERS YA ESTAN EN EL SERVIDOR
+
+############ VARS ############
+
+# production or development
+ENV="development"
+
+# same as set_conf.sh
+FOLDER_NAME="deployment"
+
+cd $HOME
+cd ..
+cd $FOLDER_NAME
+mkdir -p "data" "letsencrypt"
+mkdir github
+
+cd github
 git clone https://github.com/proyecto-arima/deployment.git
+cp docker-compose.yml ../
+mv .env.template ../.env
 
-# TODO: edit .env
-# setup dirs
-sudo mkdir data letsencrypt
+cd ..
+cd $FOLDER_NAME
+
+echo "###############################################"
+echo "docker compose config"
+docker compose config
+echo "###############################################"
+
+echo "###############################################"
+echo "nginx docker compose up"
+echo "###############################################"
 
 # web server
-# docker compose --profile deploy up -d
+docker compose --profile deploy up -d
 
-# mongo
-# docker compose --profile mongo up -d
+echo "###############################################"
+echo "RECORDA COMPLETAR EL .ENV ANTES DE EJECUTAR 'docker compose --profile <service> up -d' para el resto"
+echo "###############################################"
 
-# smtp
-# docker compose --profile smtp up -d
+echo "###############################################"
+echo "RECORDA LEVANTAR MANUALMENTE EL CONTAINER la web y el backend. luego se debera hacer auto por CI/CD"
+echo "###############################################"
 
-# app
-# docker compose --profile app up -d
+exit 0

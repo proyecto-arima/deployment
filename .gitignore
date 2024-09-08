@@ -2,6 +2,7 @@
 .env.dev
 .env.local
 .env.test
+.env
 
 data/
 letsencrypt/
