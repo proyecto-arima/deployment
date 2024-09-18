@@ -75,6 +75,11 @@ services:
       - BUCKET=${BUCKET}
       - PREFIX=${PREFIX}
 
+      - IMAGES_BUCKET=${IMAGES_BUCKET}
+
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ORGANIZATION=${OPENAI_ORGANIZATION}
+
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost:8080/health-check"]
     #   interval: 60s
@@ -90,6 +95,17 @@ services:
       - 3000:3000
     environment:
       - REACT_APP_API_URL=${REACT_APP_API_URL}
+
+  smtp4dev:
+    image: rnwood/smtp4dev:latest
+    container_name: smtp4dev
+    restart: unless-stopped
+    profiles: ["smtp4dev"]
+    ports:
+      - 2025:25
+      - 3001:80
+    volumes:
+      - ./data/smtp4dev:/var/smtp4dev
 
 volumes:
   portainer_data:
