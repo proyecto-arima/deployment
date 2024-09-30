@@ -95,6 +95,7 @@ services:
       - 3000:3000
     environment:
       - REACT_APP_API_URL=${REACT_APP_API_URL}
+      - GENERATE_SOURCEMAP=false
 
   smtp4dev:
     image: rnwood/smtp4dev:latest
