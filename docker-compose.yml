@@ -84,12 +84,6 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORGANIZATION=${OPENAI_ORGANIZATION}
 
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health-check"]
-    #   interval: 60s
-    #   timeout: 10s
-    #   retries: 5
-
   webapp:
     image: ghcr.io/proyecto-arima/webapp:${LATEST_TAG}
     container_name: webapp
@@ -101,6 +95,25 @@ services:
       - REACT_APP_API_URL=${REACT_APP_API_URL}
       - GENERATE_SOURCEMAP=false
 
+  iaservice:
+    image: ghcr.io/proyecto-arima/iaservice:${LATEST_TAG}
+    container_name: iaservice
+    profiles: ["iaservice"]
+    restart: always
+    command: bash -c "while true; do python /app/main.py; sleep 10; done"
+    environment:
+      - LANGCHAIN_TRACING_V2=true
+      - LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - LANGCHAIN_PROJECT=adaptaria
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MONGODB_URI=${MONGODB_URI}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - BUCKET=${BUCKET}
+      - PREFIX=${PREFIX}
+
   smtp4dev:
     image: rnwood/smtp4dev:latest
     container_name: smtp4dev
@@ -111,6 +124,8 @@ services:
       - 3001:80
     volumes:
       - ./data/smtp4dev:/var/smtp4dev
+
+  
 
 volumes:
   portainer_data:
