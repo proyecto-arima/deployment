@@ -100,7 +100,7 @@ services:
     container_name: iaservice
     profiles: ["iaservice"]
     restart: always
-    command: bash -c "while true; do python main.py; sleep 3600; done"
+    command: bash -c "while true; do python main.py; python audio.py; sleep 3600; done"
     environment:
       - LANGCHAIN_TRACING_V2=true
       - LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
